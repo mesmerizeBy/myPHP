@@ -1,10 +1,76 @@
 <?php
 namespace app\index\controller;
+use think\Controller;
+use think\Request;
 
-class Index
+
+class Index extends Controller
 {
+	private function deldir($directory){//自定义函数递归的函数整个目录
+	  if(file_exists($directory)){//判断目录是否存在，如果不存在rmdir()函数会出错
+	    if($dir_handle=@opendir($directory)){//打开目录返回目录资源，并判断是否成功
+	      while($filename=readdir($dir_handle)){//遍历目录，读出目录中的文件或文件夹
+	        if($filename!='.' && $filename!='..'){//一定要排除两个特殊的目录
+	          $subFile=$directory."/".$filename;//将目录下的文件与当前目录相连
+	          if(is_dir($subFile)){//如果是目录条件则成了
+	            $this->deldir($subFile);//递归调用自己删除子目录
+	          }
+	          if(is_file($subFile)){//如果是文件条件则成立
+	            unlink($subFile);//直接删除这个文件
+	          }
+	        }
+	      }
+	      closedir($dir_handle);//关闭目录资源
+	      rmdir($directory);//删除空目录
+	    }
+	  }
+	}
+	
     public function index()
     {
-        return '<style type="text/css">*{ padding: 0; margin: 0; } .think_default_text{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> ThinkPHP V5<br/><span style="font-size:30px">十年磨一剑 - 为API开发设计的高性能框架</span></p><span style="font-size:22px;">[ V5.0 版本由 <a href="http://www.qiniu.com" target="qiniu">七牛云</a> 独家赞助发布 ]</span></div><script type="text/javascript" src="https://tajs.qq.com/stats?sId=9347272" charset="UTF-8"></script><script type="text/javascript" src="https://e.topthink.com/Public/static/client.js"></script><think id="ad_bd568ce7058a1091"></think>';
+    	return  $this->fetch();
+        
     }
+    
+
+	public function login(){
+		session(["expire"=>3600,"use_cookies"=>true]);
+
+		if(session("?user")){
+			return json(array(
+				"id"=>session_id(),
+				"status"=>1,
+				"data"=>"已登录"
+			));
+		}
+
+		$user=model("Login")->where('user', request()->param('user'))->find();
+		if(empty($user)){
+			$data= json(array(
+				'status'=>0,
+				'data'=>"用户名不存在"
+			));
+		}
+		else if($user->password==request()->param('pwd')){
+			$data= json(array(
+				'status'=>1,
+				'data'=>"登录成功"
+			));
+			session("user",$user->user);
+			$dir=ROOT_PATH . 'public' . DS ."uploads".DS.session("user");
+			if(is_dir($dir)){
+				$this->deldir($dir);
+			}
+		}
+		else
+		$data= json(array(
+				'status'=>2,
+				'data'=>"密码错误"
+			));
+
+
+		return $data;
+	}
+	
+
 }

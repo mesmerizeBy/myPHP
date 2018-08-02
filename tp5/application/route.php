@@ -9,13 +9,13 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-return [
-    '__pattern__' => [
-        'name' => '\w+',
-    ],
-    '[hello]'     => [
-        ':id'   => ['index/hello', ['method' => 'get'], ['id' => '\d+']],
-        ':name' => ['index/hello', ['method' => 'post']],
-    ],
 
+
+
+return [
+    'index' => 'index/index/index',
+    'upload' => ['index/article/upload', ['method' => 'post']],
+    'login' => ['index/index/login', ['method' => 'post']],
+    'publish' => ['index/article/publish', ['method' => 'post']],
+    'getArticle'=>'index/article/getArticle'
 ];
