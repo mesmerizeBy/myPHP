@@ -17,5 +17,9 @@ return [
     'upload' => ['index/article/upload', ['method' => 'post']],
     'login' => ['index/index/login', ['method' => 'post']],
     'publish' => ['index/article/publish', ['method' => 'post']],
-    'getArticle'=>'index/article/getArticle'
+    'getArticle'=>'index/article/getArticle',
+    'getArticleList'=>'index/article/getArticleList',
+    "removeArticle"=>"index/article/removeArticle",
+    "getStu"=>["index/master/getStu", ['method' => 'post']],
+    "getStuGrade"=>["index/master/getStuGrade", ['method' => 'post']]
 ];
